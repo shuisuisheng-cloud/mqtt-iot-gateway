@@ -1,1 +1,1 @@
-print("Hello Linux Serial Tool")
+print("linux-serial-tool\npython3.0\nshuisuisheng")
