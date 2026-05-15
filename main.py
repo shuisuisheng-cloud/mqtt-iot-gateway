@@ -3,7 +3,10 @@ verision="v0.1"
 author="shuisuisheng"
 port="/dev/ttyUSB0"
 temperature_str="25.3"
-baudrate=9600
 temperature=float(temperature_str)
-print(project_name+'\n'+verision+'\n'+author+'\n'+port+'\n'+temperature_str)
-print(str(temperature)+'\n'+str(temperature+1)+'\n'+str(baudrate))
+baudrate=9600
+threshold=30
+if temperature > threshold:
+    print("warning")
+else:
+    print("normal")
