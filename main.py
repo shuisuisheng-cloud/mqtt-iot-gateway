@@ -6,8 +6,10 @@ def check_temperature(temp):
         return "warning"
     else:
         return "normal"
-def read_temperature():
-    return round(random.uniform(20,40),1)
+def read_serial_data():
+    return "temperature:"+str(round(random.uniform(20,35),1))
+def parse_temperature(data):
+    return float(data.split(":")[1])
 def main():
     project_name="linux-serial-tool"
     verision="v0.1"
@@ -16,8 +18,9 @@ def main():
     baudrate=9600
     count=1
     while count <=5:
-        temperature_str=str(read_temperature())
-        temperature=float(temperature_str)
+        serial_data=read_serial_data()
+        temperature=parse_temperature(serial_data)
+        temperature_str=str(temperature)
         time.sleep(1)
         print("temperature:"+temperature_str,"status:"+check_temperature(temperature))
         count +=1
