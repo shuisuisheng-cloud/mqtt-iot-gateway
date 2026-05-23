@@ -25,11 +25,13 @@ def main():
     port="/dev/ttyUSB0"
     baudrate=9600
     count=1
-    while count <=5:
-        serial_data=read_serial_data()
+    test_data = ["temperature:28.6","temperature:abc","error_data","temperature:","temperature:31.5"]
+    while count <=len(test_data):
+        serial_data=test_data[count-1]
         temperature=parse_temperature(serial_data)
         if temperature is None:
             save_line("invalid data:"+serial_data)
+            time.sleep(1)
             print("invalid data")
         else:
             temperature_str=str(temperature)
@@ -40,4 +42,3 @@ def main():
         count +=1
 if __name__ == "__main__":    
     main()
-# "temperature:"+str(round(random.uniform(20,40),1))
