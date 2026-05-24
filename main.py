@@ -33,9 +33,11 @@ def main():
             print("invalid data")
         else:
             temperature_str=str(temperature)
+            status=check_temperature(temperature)
             time.sleep(1)
-            log="temperature:"+temperature_str+" "+"status:"+check_temperature(temperature)
+            log="temperature:"+temperature_str+" "+"status:"+status
             save_line(str(log))
-            print(log)
+            device_data={"temperature":temperature,"status":status}
+            print(device_data)
 if __name__ == "__main__":    
     main()
