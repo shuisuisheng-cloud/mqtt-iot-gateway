@@ -1,5 +1,6 @@
 import time
 import random
+import json
 threshold=30
 def save_line(line):
     with open("logs/serial.log","a",encoding="utf-8") as f:
@@ -38,6 +39,8 @@ def main():
             log="temperature:"+temperature_str+" "+"status:"+status
             save_line(str(log))
             device_data={"temperature":temperature,"status":status}
-            print(device_data)
+            json_data=json.dumps(device_data)
+            print("json",json_data)
+            print("dict",device_data)
 if __name__ == "__main__":    
     main()
