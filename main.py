@@ -33,13 +33,11 @@ def main():
             time.sleep(1)
             print("invalid data")
         else:
-            temperature_str=str(temperature)
             status=check_temperature(temperature)
             time.sleep(1)
-            log="temperature:"+temperature_str+" "+"status:"+status
-            save_line(str(log))
             device_data={"temperature":temperature,"status":status}
             json_data=json.dumps(device_data)
+            save_line(json_data)
             print("json",json_data)
             print("dict",device_data)
 if __name__ == "__main__":    
