@@ -25,20 +25,20 @@ def main():
     author="shuisuisheng"
     port="/dev/ttyUSB0"
     baudrate=9600
+    device = "stm32_node_01"
     test_data = ["temperature:28.6","temperature:abc","error_data","temperature:","temperature:31.5"]
     for serial_data in test_data:
         temperature=parse_temperature(serial_data)
         if temperature is None:
-            save_line("invalid data:"+serial_data)
+            save_line("device:"+device+" invalid data:"+serial_data)
             time.sleep(1)
-            print("invalid data")
+            print("invalid data:",serial_data)
         else:
             status=check_temperature(temperature)
             time.sleep(1)
-            device_data={"temperature":temperature,"status":status}
+            device_data={"device":device,"temperature":temperature,"status":status}
             json_data=json.dumps(device_data)
             save_line(json_data)
-            print("json",json_data)
-            print("dict",device_data)
+            print("valid data:","temperature:",device_data["temperature"],"status:",device_data["status"])
 if __name__ == "__main__":    
     main()
