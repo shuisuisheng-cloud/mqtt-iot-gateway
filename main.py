@@ -19,6 +19,20 @@ def parse_temperature(data):
         return temperature
     except:
         return None
+def build_device_data(device,temperature,status):
+    return {"device":device,"temperature":temperature,"status":status}
+def handle_json_data(temperature,device):
+    status=check_temperature(temperature)
+    device_data=build_device_data(device,temperature,status)
+    json_data=json.dumps(device_data)
+    save_line(json_data)
+    time.sleep(1)
+    print("valid data:","temperature:",device_data["temperature"],"status:",device_data["status"])
+def handle_invalid_data(device,data):
+    line="device:"+device+"invalid_data:"+data
+    save_line(line)
+    time.sleep(1)
+    print("invalid data:"+data)
 def main():
     project_name="linux-serial-tool"
     verision="v0.1"
@@ -30,15 +44,8 @@ def main():
     for serial_data in test_data:
         temperature=parse_temperature(serial_data)
         if temperature is None:
-            save_line("device:"+device+" invalid data:"+serial_data)
-            time.sleep(1)
-            print("invalid data:",serial_data)
+            handle_invalid_data(device,serial_data)
         else:
-            status=check_temperature(temperature)
-            time.sleep(1)
-            device_data={"device":device,"temperature":temperature,"status":status}
-            json_data=json.dumps(device_data)
-            save_line(json_data)
-            print("valid data:","temperature:",device_data["temperature"],"status:",device_data["status"])
+            handle_json_data(temperature,device)
 if __name__ == "__main__":    
     main()
