@@ -21,19 +21,20 @@ def parse_temperature(data):
         return None
 def build_device_data(device,temperature,status,time):
     return {"device":device,"temperature":temperature,"status":status,"timestamp":time}
-def handle_json_data(temperature,device):
+def get_timestamp():
+    return time.strftime("%Y-%m-%d %H:%M:%S")
+def handle_valid_data(temperature,device,timestamp):
     status=check_temperature(temperature)
-    timestatus=time.strftime("%Y-%m-%d %H:%M:%S")
-    device_data=build_device_data(device,temperature,status,timestatus)
+    device_data=build_device_data(device,temperature,status,timestamp)
     json_data=json.dumps(device_data)
     save_line(json_data)
     time.sleep(1)
-    print("valid data:","temperature:",device_data["temperature"],"status:",device_data["status"],"timestamp:",device_data["timestamp"])
+    print("valid data:","device:",device_data["device"],"temperature:",device_data["temperature"],"status:",device_data["status"],"timestamp:",device_data["timestamp"])
 def handle_invalid_data(device,data,timestatus):
     line="device:"+" "+device+" "+"invalid_data:"+" "+data+" "+"timestamp:"+" "+timestatus
     save_line(line)
     time.sleep(1)
-    print("invalid data:" + data,"timestamp:" + timestatus)
+    print("invalid data: "+"device: "+device +"raw: "+ data,"timestamp: " + timestatus)
 def main():
     project_name="linux-serial-tool"
     verision="v0.1"
@@ -42,12 +43,12 @@ def main():
     baudrate=9600
     device = "stm32_node_01"
     test_data = ["temperature:28.6","temperature:abc","error_data","temperature:","temperature:31.5"]
-    timestatus=time.strftime("%Y-%m-%d %H:%M:%S")
     for serial_data in test_data:
         temperature=parse_temperature(serial_data)
+        timestamp = get_timestamp()
         if temperature is None:
-            handle_invalid_data(device,serial_data,timestatus)
+            handle_invalid_data(device,serial_data,timestamp)
         else:
-            handle_json_data(temperature,device)
+            handle_valid_data(temperature,device,timestamp)
 if __name__ == "__main__":    
     main()
