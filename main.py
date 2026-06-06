@@ -1,8 +1,10 @@
 import time
 import random
 import json
+import os
 threshold=30
 def save_line(line):
+    os.makedirs("logs", exist_ok=True)
     with open("logs/serial.log","a",encoding="utf-8") as f:
         f.write(line+"\n")
 def check_temperature(temp):
