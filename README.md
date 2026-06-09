@@ -50,17 +50,21 @@ valid data: device: stm32_node_01 temperature: 31.5 status: warning timestamp: 2
 device:stm32_node_01 invalid_data:temperature:abc timestamp:2026-06-04 15:24:24
 ```
 
-## 依赖安装
+## 当前阶段说明
 
-当前版本仅使用 Python 标准库，无需额外安装第三方依赖。
+当前版本仍使用模拟串口数据进行测试。
 
-后续接入真实串口和 MQTT 后，将使用：
+项目已加入 pyserial 依赖，并预留真实串口读取函数：
+
+```python
+read_serial_data_from_port(port, baudrate)
+```
+
+## 当前依赖
 
 - pyserial
+
+## 后续依赖
+
 - paho-mqtt
 
-如果后续 requirements.txt 中加入依赖，可使用：
-
-```bash
-pip install -r requirements.txt
-```

@@ -1,5 +1,5 @@
-# No external dependencies yet.
+pyserial
+
 # Built-in modules used: time, random, json, os
 # Future dependencies:
-# pyserial
 # paho-mqtt
