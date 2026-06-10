@@ -5,10 +5,14 @@ import os
 import serial
 threshold=30
 def read_serial_data_from_port(port, baudrate):
-    ser = serial.Serial(port, baudrate, timeout=1)
-    line = ser.readline().decode("utf-8").strip()
-    ser.close()
-    return line
+    try:
+        ser = serial.Serial(port, baudrate, timeout=1)
+        line = ser.readline().decode("utf-8").strip()
+        ser.close()
+        return line
+    except:
+        print("serial read error")
+        return None
 def save_line(line):
     os.makedirs("logs", exist_ok=True)
     with open("logs/serial.log","a",encoding="utf-8") as f:
