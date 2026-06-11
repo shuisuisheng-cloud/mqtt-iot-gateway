@@ -54,13 +54,18 @@ def main():
     port="/dev/ttyUSB0"
     baudrate=9600
     device = "stm32_node_01"
+    use_real_serial=False
     test_data = ["temperature:28.6","temperature:abc","error_data","temperature:","temperature:31.5"]
-    for serial_data in test_data:
-        temperature=parse_temperature(serial_data)
-        timestamp = get_timestamp()
-        if temperature is None:
-            handle_invalid_data(device,serial_data,timestamp)
-        else:
-            handle_valid_data(temperature,device,timestamp)
+    if use_real_serial:
+        print("real serial mode")
+    else:
+        print("mock serial mode")
+        for serial_data in test_data:
+            temperature=parse_temperature(serial_data)
+            timestamp = get_timestamp()
+            if temperature is None:
+                handle_invalid_data(device,serial_data,timestamp)
+            else:
+                handle_valid_data(temperature,device,timestamp)
 if __name__ == "__main__":    
     main()
