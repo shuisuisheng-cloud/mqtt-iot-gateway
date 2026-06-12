@@ -58,6 +58,17 @@ def main():
     test_data = ["temperature:28.6","temperature:abc","error_data","temperature:","temperature:31.5"]
     if use_real_serial:
         print("real serial mode")
+        serial_data_port=read_serial_data_from_port(port,baudrate)
+        timestamp=get_timestamp()
+        if serial_data_port is None:
+            print("read serial_data_from_port fail")
+            handle_invalid_data(device, "serial_read_failed", timestamp)
+        else:
+            temperature=parse_temperature(serial_data_port)
+            if temperature is None:
+                handle_invalid_data(device,serial_data,timestamp)
+            else:
+                handle_valid_data(temperature,device,timestamp)
     else:
         print("mock serial mode")
         for serial_data in test_data:

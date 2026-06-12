@@ -1,8 +1,10 @@
-# Linux Serial Tool
+# mqtt-iot-gateway
 
 ## 项目简介
 
-这是一个基于 Linux / WSL + Python 的串口数据解析与日志工具。
+这是一个基于 Linux + Python + pyserial + MQTT 的物联网边缘网关项目。
+
+当前版本已完成串口数据解析、JSON 日志、异常处理、模式切换和 pyserial 读取函数预留，后续将接入 MQTT 发布与订阅。
 
 当前项目用于模拟从 STM32 等嵌入式设备接收串口数据，完成温度数据解析、异常数据处理、JSON 格式转换和日志保存。
 
