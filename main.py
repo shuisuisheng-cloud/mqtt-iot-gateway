@@ -62,7 +62,15 @@ def main():
         timestamp=get_timestamp()
         if serial_data_port is None:
             print("read serial_data_from_port fail")
+            print("fellback to mock serial mode")
             handle_invalid_data(device, "serial_read_failed", timestamp)
+            for mock_data in test_data:
+                timestamp2=get_timestamp()
+                temperature=parse_temperature(mock_data)
+                if temperature is None:
+                    handle_invalid_data(device,mock_data,timestamp2)
+                else:
+                    handle_valid_data(temperature,device,timestamp2)
         else:
             temperature=parse_temperature(serial_data_port)
             if temperature is None:
