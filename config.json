@@ -1,0 +1,9 @@
+{
+    "project_name": "Linux-STM32 IoT Edge Gateway",
+    "version": "v0.1",
+    "author": "shuisuisheng",
+    "port": "/dev/ttyUSB0",
+    "baudrate": 9600,
+    "device": "stm32_node_01",
+    "use_real_serial": false
+}

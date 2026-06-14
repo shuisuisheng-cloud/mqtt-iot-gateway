@@ -35,6 +35,10 @@ def build_device_data(device,temperature,status,time):
     return {"device":device,"temperature":temperature,"status":status,"timestamp":time}
 def get_timestamp():
     return time.strftime("%Y-%m-%d %H:%M:%S")
+def load_config():
+    with open("config.json","r",encoding="utf-8") as f:
+        config=json.load(f)
+    return config
 def handle_valid_data(temperature,device,timestamp):
     status=check_temperature(temperature)
     device_data=build_device_data(device,temperature,status,timestamp)
@@ -48,13 +52,14 @@ def handle_invalid_data(device,data,timestatus):
     time.sleep(1)
     print("invalid data: "+"device: "+device +"raw: "+ data,"timestamp: " + timestatus)
 def main():
-    project_name="linux-serial-tool"
-    verision="v0.1"
-    author="shuisuisheng"
-    port="/dev/ttyUSB0"
-    baudrate=9600
-    device = "stm32_node_01"
-    use_real_serial=False
+    config=load_config()
+    project_name=config["project_name"]
+    verision=config["version"]
+    author=config["author"]
+    port=config["port"]
+    baudrate=config["baudrate"]
+    device = config["device"]
+    use_real_serial=config["use_real_serial"]
     test_data = ["temperature:28.6","temperature:abc","error_data","temperature:","temperature:31.5"]
     if use_real_serial:
         print("real serial mode")

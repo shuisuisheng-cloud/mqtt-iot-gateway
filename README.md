@@ -51,7 +51,21 @@ valid data: device: stm32_node_01 temperature: 31.5 status: warning timestamp: 2
 ```text
 device:stm32_node_01 invalid_data:temperature:abc timestamp:2026-06-04 15:24:24
 ```
+## 配置文件
 
+项目使用 `config.json` 管理网关基础参数：
+
+```json
+{
+    "project_name": "Linux-STM32 IoT Edge Gateway",
+    "version": "v0.1",
+    "author": "shuisuisheng",
+    "port": "/dev/ttyUSB0",
+    "baudrate": 9600,
+    "device": "stm32_node_01",
+    "use_real_serial": false
+}
+```
 ## 当前阶段说明
 
 当前版本仍使用模拟串口数据进行测试。
