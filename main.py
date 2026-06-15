@@ -3,7 +3,6 @@ import random
 import json
 import os
 import serial
-threshold=30
 def read_serial_data_from_port(port, baudrate):
     try:
         ser = serial.Serial(port, baudrate, timeout=1)
@@ -17,7 +16,7 @@ def save_line(line):
     os.makedirs("logs", exist_ok=True)
     with open("logs/serial.log","a",encoding="utf-8") as f:
         f.write(line+"\n")
-def check_temperature(temp):
+def check_temperature(temp,threshold):
     if temp > threshold:
         return "warning"
     else:
@@ -31,17 +30,17 @@ def parse_temperature(data):
         return temperature
     except:
         return None
-def build_device_data(device,temperature,status,time):
-    return {"device":device,"temperature":temperature,"status":status,"timestamp":time}
+def build_device_data(device,temperature,status,time,threshold):
+    return {"device":device,"temperature":temperature,"status":status,"timestamp":time,"temperature_threshold":threshold}
 def get_timestamp():
     return time.strftime("%Y-%m-%d %H:%M:%S")
 def load_config():
     with open("config.json","r",encoding="utf-8") as f:
         config=json.load(f)
     return config
-def handle_valid_data(temperature,device,timestamp):
-    status=check_temperature(temperature)
-    device_data=build_device_data(device,temperature,status,timestamp)
+def handle_valid_data(temperature,device,timestamp,threshold):
+    status=check_temperature(temperature,threshold)
+    device_data=build_device_data(device,temperature,status,timestamp,threshold)
     json_data=json.dumps(device_data)
     save_line(json_data)
     time.sleep(1)
@@ -53,6 +52,7 @@ def handle_invalid_data(device,data,timestatus):
     print("invalid data: "+"device: "+device +"raw: "+ data,"timestamp: " + timestatus)
 def main():
     config=load_config()
+    threshold=config["temperature_threshold"]
     project_name=config["project_name"]
     verision=config["version"]
     author=config["author"]
@@ -75,13 +75,13 @@ def main():
                 if temperature is None:
                     handle_invalid_data(device,mock_data,timestamp2)
                 else:
-                    handle_valid_data(temperature,device,timestamp2)
+                    handle_valid_data(temperature,device,timestamp2,threshold)
         else:
             temperature=parse_temperature(serial_data_port)
             if temperature is None:
-                handle_invalid_data(device,serial_data,timestamp)
+                handle_invalid_data(device,serial_data_port,timestamp)
             else:
-                handle_valid_data(temperature,device,timestamp)
+                handle_valid_data(temperature,device,timestamp,threshold)
     else:
         print("mock serial mode")
         for serial_data in test_data:
@@ -90,6 +90,6 @@ def main():
             if temperature is None:
                 handle_invalid_data(device,serial_data,timestamp)
             else:
-                handle_valid_data(temperature,device,timestamp)
+                handle_valid_data(temperature,device,timestamp,threshold)
 if __name__ == "__main__":    
     main()
