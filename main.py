@@ -50,6 +50,13 @@ def handle_invalid_data(device,data,timestatus):
     save_line(line)
     time.sleep(1)
     print("invalid data: "+"device: "+device +"raw: "+ data,"timestamp: " + timestatus)
+def process_serial_data(device,serial_data,threshold):
+    timestamp=get_timestamp()
+    temperature=parse_temperature(serial_data)
+    if temperature is None:
+        handle_invalid_data(device,serial_data,timestamp)
+    else:
+        handle_valid_data(temperature,device,timestamp,threshold)
 def main():
     config=load_config()
     threshold=config["temperature_threshold"]
@@ -70,26 +77,12 @@ def main():
             print("fellback to mock serial mode")
             handle_invalid_data(device, "serial_read_failed", timestamp)
             for mock_data in test_data:
-                timestamp2=get_timestamp()
-                temperature=parse_temperature(mock_data)
-                if temperature is None:
-                    handle_invalid_data(device,mock_data,timestamp2)
-                else:
-                    handle_valid_data(temperature,device,timestamp2,threshold)
+               process_serial_data(device,mock_data,threshold)
         else:
-            temperature=parse_temperature(serial_data_port)
-            if temperature is None:
-                handle_invalid_data(device,serial_data_port,timestamp)
-            else:
-                handle_valid_data(temperature,device,timestamp,threshold)
+            process_serial_data(device,serial_data_port,threshold)
     else:
         print("mock serial mode")
         for serial_data in test_data:
-            temperature=parse_temperature(serial_data)
-            timestamp = get_timestamp()
-            if temperature is None:
-                handle_invalid_data(device,serial_data,timestamp)
-            else:
-                handle_valid_data(temperature,device,timestamp,threshold)
+            process_serial_data(device,serial_data,threshold)
 if __name__ == "__main__":    
     main()

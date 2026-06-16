@@ -5,6 +5,6 @@
     "port": "/dev/ttyUSB0",
     "baudrate": 9600,
     "device": "stm32_node_01",
-    "use_real_serial": false ,
+    "use_real_serial":  false ,
     "temperature_threshold": 30
 }
