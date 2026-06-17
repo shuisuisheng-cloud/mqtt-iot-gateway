@@ -45,18 +45,20 @@ def handle_valid_data(temperature,device,timestamp,threshold):
     save_line(json_data)
     time.sleep(1)
     print("valid data:","device:",device_data["device"],"temperature:",device_data["temperature"],"status:",device_data["status"],"timestamp:",device_data["timestamp"])
+    return json_data
 def handle_invalid_data(device,data,timestatus):
     line="device:"+" "+device+" "+"invalid_data:"+" "+data+" "+"timestamp:"+" "+timestatus
     save_line(line)
     time.sleep(1)
     print("invalid data: "+"device: "+device +"raw: "+ data,"timestamp: " + timestatus)
+    return None
 def process_serial_data(device,serial_data,threshold):
     timestamp=get_timestamp()
     temperature=parse_temperature(serial_data)
     if temperature is None:
-        handle_invalid_data(device,serial_data,timestamp)
+        return handle_invalid_data(device,serial_data,timestamp)
     else:
-        handle_valid_data(temperature,device,timestamp,threshold)
+        return handle_valid_data(temperature,device,timestamp,threshold)
 def main():
     config=load_config()
     threshold=config["temperature_threshold"]
