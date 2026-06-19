@@ -68,8 +68,22 @@ def main():
     port=config["port"]
     baudrate=config["baudrate"]
     device = config["device"]
+    mqtt_enabled = config["mqtt_enabled"]
+    mqtt_broker = config["mqtt_broker"]
+    mqtt_port = config["mqtt_port"]
+    mqtt_client_id = config["mqtt_client_id"]
+    mqtt_topic_prefix = config["mqtt_topic_prefix"]
+    mqtt_keepalive = config["mqtt_keepalive"]
     use_real_serial=config["use_real_serial"]
+    telemetry_topic = f"{mqtt_topic_prefix}/{device}/telemetry"
+    command_topic = f"{mqtt_topic_prefix}/{device}/command"
     test_data = ["temperature:28.6","temperature:abc","error_data","temperature:","temperature:31.5"]
+    print("mqtt enabled:", mqtt_enabled)
+    print("mqtt broker:", mqtt_broker)
+    print("mqtt port:", mqtt_port)
+    print("mqtt client id:", mqtt_client_id)
+    print("telemetry topic:", telemetry_topic)
+    print("command topic:", command_topic)
     if use_real_serial:
         print("real serial mode")
         serial_data_port=read_serial_data_from_port(port,baudrate)
