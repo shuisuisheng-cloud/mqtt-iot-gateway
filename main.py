@@ -3,7 +3,7 @@ import random
 import json
 import os
 import serial
-from mqtt_client import create_mqtt_client
+from mqtt_client import create_mqtt_client,connect_mqtt_client
 def read_serial_data_from_port(port, baudrate):
     try:
         ser = serial.Serial(port, baudrate, timeout=1)
@@ -81,8 +81,14 @@ def main():
     test_data = ["temperature:28.6","temperature:abc","error_data","temperature:","temperature:31.5"]
     mqtt_client=None
     if mqtt_enabled:
-        create_mqtt_client(mqtt_client_id)
+        mqtt_client=create_mqtt_client(mqtt_client_id)
         print("mqtt client created")
+        connect_mqtt_client(
+            mqtt_client,
+            mqtt_broker,
+            mqtt_port,
+            mqtt_keepalive
+        )
     else:
         print("mqtt disabled")
     print("mqtt enabled:", mqtt_enabled)
