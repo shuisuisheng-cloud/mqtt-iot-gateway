@@ -14,3 +14,12 @@ def connect_mqtt_client(client,broker,port,keepalive):
     client.on_connect =on_connect
     client.connect(broker,port,keepalive)
     client.loop_start()
+def publish_mqtt_message(client,topic,payload):
+    message_info = client.publish(topic,payload)
+    if message_info.rc==mqtt.MQTT_ERR_SUCCESS:
+        message_info.wait_for_publish()
+        print("mqtt message published:",topic)
+        return True
+    else:
+        print("mqtt publish failed:", message_info.rc)
+        return False

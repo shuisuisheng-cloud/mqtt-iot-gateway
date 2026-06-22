@@ -3,7 +3,7 @@ import random
 import json
 import os
 import serial
-from mqtt_client import create_mqtt_client,connect_mqtt_client
+from mqtt_client import create_mqtt_client,connect_mqtt_client,publish_mqtt_message
 def read_serial_data_from_port(port, baudrate):
     try:
         ser = serial.Serial(port, baudrate, timeout=1)
@@ -112,6 +112,8 @@ def main():
     else:
         print("mock serial mode")
         for serial_data in test_data:
-            process_serial_data(device,serial_data,threshold)
+            payload=process_serial_data(device,serial_data,threshold)
+            if payload is not None and mqtt_client is not None:
+                publish_mqtt_message(mqtt_client,telemetry_topic,payload)
 if __name__ == "__main__":    
     main()
