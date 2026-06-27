@@ -87,8 +87,11 @@ def main():
             mqtt_client,
             mqtt_broker,
             mqtt_port,
-            mqtt_keepalive
+            mqtt_keepalive,
+            command_topic
         )
+        print("waiting for mqtt command...")
+        time.sleep(15)
     else:
         print("mqtt disabled")
     print("mqtt enabled:", mqtt_enabled)
