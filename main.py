@@ -91,7 +91,7 @@ def main():
             command_topic
         )
         print("waiting for mqtt command...")
-        time.sleep(15)
+        time.sleep(60)  # Temporary command receive window for testing
     else:
         print("mqtt disabled")
     print("mqtt enabled:", mqtt_enabled)

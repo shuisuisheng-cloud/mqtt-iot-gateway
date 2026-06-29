@@ -1,4 +1,5 @@
 import paho.mqtt.client as mqtt
+from command_handler import parse_command_payload
 def on_connect(client,userdata,connect_flags,reason_code,properties):
     if reason_code == 0:
         print("mqtt broker connected:",reason_code)
@@ -34,3 +35,7 @@ def on_message(client,userdata,message):
     print("mqtt command received")
     print("topic:",topic)
     print("payload",payload)
+    command=parse_command_payload(payload)
+    if command is None:
+        return
+    print("command:",command)
