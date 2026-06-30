@@ -17,5 +17,15 @@ def parse_command_payload(payload_text):
         print("command cannot be empty")
         return None
     return command
+def execute_command(command):
+    if command == "led_on":
+        print("simulated actuator: LED ON")
+        return True
 
-    
+    elif command == "led_off":
+        print("simulated actuator: LED OFF")
+        return True
+
+    else:
+        print("unsupported command:", command)
+        return False

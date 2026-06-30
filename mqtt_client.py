@@ -1,5 +1,5 @@
 import paho.mqtt.client as mqtt
-from command_handler import parse_command_payload
+from command_handler import parse_command_payload,execute_command
 def on_connect(client,userdata,connect_flags,reason_code,properties):
     if reason_code == 0:
         print("mqtt broker connected:",reason_code)
@@ -39,3 +39,8 @@ def on_message(client,userdata,message):
     if command is None:
         return
     print("command:",command)
+    command_result=execute_command(command)
+    if command_result:
+        print("command executed successfully:",command)
+    else:
+        print("command execution failed:",command)
