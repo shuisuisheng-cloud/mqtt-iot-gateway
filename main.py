@@ -78,6 +78,7 @@ def main():
     use_real_serial=config["use_real_serial"]
     telemetry_topic = f"{mqtt_topic_prefix}/{device}/telemetry"
     command_topic = f"{mqtt_topic_prefix}/{device}/command"
+    ack_topic =f"{mqtt_topic_prefix}/{device}/ack"
     test_data = ["temperature:28.6","temperature:abc","error_data","temperature:","temperature:31.5"]
     mqtt_client=None
     if mqtt_enabled:
@@ -88,10 +89,11 @@ def main():
             mqtt_broker,
             mqtt_port,
             mqtt_keepalive,
-            command_topic
+            command_topic,
+            ack_topic
         )
         print("waiting for mqtt command...")
-        time.sleep(60)  # Temporary command receive window for testing
+        time.sleep(15)  # Temporary command receive window for testing
     else:
         print("mqtt disabled")
     print("mqtt enabled:", mqtt_enabled)

@@ -1,5 +1,5 @@
 import paho.mqtt.client as mqtt
-from command_handler import parse_command_payload,execute_command
+from command_handler import parse_command_payload,execute_command,build_command_ack
 def on_connect(client,userdata,connect_flags,reason_code,properties):
     if reason_code == 0:
         print("mqtt broker connected:",reason_code)
@@ -14,8 +14,8 @@ def create_mqtt_client(client_id):
         client_id=client_id
     )
     return client
-def connect_mqtt_client(client,broker,port,keepalive,command_topic):
-    client.user_data_set({"command_topic":command_topic})
+def connect_mqtt_client(client,broker,port,keepalive,command_topic,ack_topic):
+    client.user_data_set({"command_topic":command_topic,"ack_topic":ack_topic})
     client.on_connect =on_connect
     client.on_message=on_message
     client.connect(broker,port,keepalive)
@@ -28,6 +28,14 @@ def publish_mqtt_message(client,topic,payload):
         return True
     else:
         print("mqtt publish failed:", message_info.rc)
+        return False
+def publish_command_ack(client,topic,payload):
+    message_info=client.publish(topic,payload)
+    if message_info.rc == mqtt.MQTT_ERR_SUCCESS:
+        print("mqtt ack queued:",topic)
+        return True
+    else:
+        print("mqtt ack publish failed:",message_info.rc)
         return False
 def on_message(client,userdata,message):
     topic=message.topic
@@ -44,3 +52,6 @@ def on_message(client,userdata,message):
         print("command executed successfully:",command)
     else:
         print("command execution failed:",command)
+    ack_topic=userdata["ack_topic"]
+    ack_payload=build_command_ack(command,command_result)
+    publish_command_ack(client,ack_topic,ack_payload)

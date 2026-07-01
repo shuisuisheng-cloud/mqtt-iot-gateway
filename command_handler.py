@@ -29,3 +29,15 @@ def execute_command(command):
     else:
         print("unsupported command:", command)
         return False
+def build_command_ack(command, success):
+    if success:
+        status = "success"
+    else:
+        status = "failed"
+
+    ack_data = {
+        "command": command,
+        "status": status
+    }
+
+    return json.dumps(ack_data)
