@@ -55,3 +55,7 @@ def on_message(client,userdata,message):
     ack_topic=userdata["ack_topic"]
     ack_payload=build_command_ack(command,command_result)
     publish_command_ack(client,ack_topic,ack_payload)
+def disconnect_mqtt_client(client):
+    client.disconnect()
+    client.loop_stop()
+    print("mqtt connect disconnected")

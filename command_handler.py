@@ -41,3 +41,4 @@ def build_command_ack(command, success):
     }
 
     return json.dumps(ack_data)
+

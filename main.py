@@ -3,7 +3,7 @@ import random
 import json
 import os
 import serial
-from mqtt_client import create_mqtt_client,connect_mqtt_client,publish_mqtt_message
+from mqtt_client import create_mqtt_client,connect_mqtt_client,publish_mqtt_message,disconnect_mqtt_client
 def read_serial_data_from_port(port, baudrate):
     try:
         ser = serial.Serial(port, baudrate, timeout=1)
@@ -92,8 +92,6 @@ def main():
             command_topic,
             ack_topic
         )
-        print("waiting for mqtt command...")
-        time.sleep(15)  # Temporary command receive window for testing
     else:
         print("mqtt disabled")
     print("mqtt enabled:", mqtt_enabled)
@@ -120,5 +118,14 @@ def main():
             payload=process_serial_data(device,serial_data,threshold)
             if payload is not None and mqtt_client is not None:
                 publish_mqtt_message(mqtt_client,telemetry_topic,payload)
+    if mqtt_client is not None:
+            try:
+                print("gateway running, press Ctrl+C to stop")
+                while True:
+                    time.sleep(1)
+            except KeyboardInterrupt:
+                print("\ngateway shutdown requested")
+            finally:
+                disconnect_mqtt_client(mqtt_client)   
 if __name__ == "__main__":    
     main()
