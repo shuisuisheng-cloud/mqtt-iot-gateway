@@ -4,6 +4,7 @@ import json
 import os
 import serial
 from mqtt_client import create_mqtt_client,connect_mqtt_client,publish_mqtt_message,disconnect_mqtt_client
+from gateway_status import build_heartbeat_payload
 def read_serial_data_from_port(port, baudrate):
     try:
         ser = serial.Serial(port, baudrate, timeout=1)
@@ -76,9 +77,11 @@ def main():
     mqtt_topic_prefix = config["mqtt_topic_prefix"]
     mqtt_keepalive = config["mqtt_keepalive"]
     use_real_serial=config["use_real_serial"]
+    heartbeat_interval = config["heartbeat_interval"]
     telemetry_topic = f"{mqtt_topic_prefix}/{device}/telemetry"
     command_topic = f"{mqtt_topic_prefix}/{device}/command"
     ack_topic =f"{mqtt_topic_prefix}/{device}/ack"
+    heartbeat_topic = (f"{mqtt_topic_prefix}/gateway/{mqtt_client_id}/heartbeat")
     test_data = ["temperature:28.6","temperature:abc","error_data","temperature:","temperature:31.5"]
     mqtt_client=None
     if mqtt_enabled:
@@ -119,9 +122,16 @@ def main():
             if payload is not None and mqtt_client is not None:
                 publish_mqtt_message(mqtt_client,telemetry_topic,payload)
     if mqtt_client is not None:
+            last_heartbeat_time=0.0
             try:
                 print("gateway running, press Ctrl+C to stop")
                 while True:
+                    current_time=time.monotonic()
+                    if current_time - last_heartbeat_time >= heartbeat_interval:
+                        timestamp=get_timestamp()
+                        heartbeat_payload=(build_heartbeat_payload(mqtt_client_id,device,timestamp))
+                        publish_mqtt_message(mqtt_client,heartbeat_topic,heartbeat_payload)
+                        last_heartbeat_time=current_time
                     time.sleep(1)
             except KeyboardInterrupt:
                 print("\ngateway shutdown requested")
