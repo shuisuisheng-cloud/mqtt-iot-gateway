@@ -59,3 +59,6 @@ def disconnect_mqtt_client(client):
     client.disconnect()
     client.loop_stop()
     print("mqtt connect disconnected")
+def configure_mqtt_last_will(client,topic,payload):
+    client.will_set(topic,payload)
+    print("mqtt last will configure:",topic)

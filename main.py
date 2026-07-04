@@ -3,8 +3,8 @@ import random
 import json
 import os
 import serial
-from mqtt_client import create_mqtt_client,connect_mqtt_client,publish_mqtt_message,disconnect_mqtt_client
-from gateway_status import build_heartbeat_payload
+from mqtt_client import create_mqtt_client,connect_mqtt_client,publish_mqtt_message,disconnect_mqtt_client,configure_mqtt_last_will
+from gateway_status import build_heartbeat_payload,build_gateway_status_payload
 def read_serial_data_from_port(port, baudrate):
     try:
         ser = serial.Serial(port, baudrate, timeout=1)
@@ -82,11 +82,14 @@ def main():
     command_topic = f"{mqtt_topic_prefix}/{device}/command"
     ack_topic =f"{mqtt_topic_prefix}/{device}/ack"
     heartbeat_topic = (f"{mqtt_topic_prefix}/gateway/{mqtt_client_id}/heartbeat")
+    status_topic=(f"{mqtt_topic_prefix}/gateway/{mqtt_client_id}/status")
     test_data = ["temperature:28.6","temperature:abc","error_data","temperature:","temperature:31.5"]
     mqtt_client=None
     if mqtt_enabled:
         mqtt_client=create_mqtt_client(mqtt_client_id)
         print("mqtt client created")
+        status_payload=build_gateway_status_payload(mqtt_client_id,device)
+        configure_mqtt_last_will(mqtt_client,status_topic,status_payload)
         connect_mqtt_client(
             mqtt_client,
             mqtt_broker,
