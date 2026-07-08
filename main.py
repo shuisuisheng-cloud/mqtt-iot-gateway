@@ -84,11 +84,12 @@ def main():
     heartbeat_topic = (f"{mqtt_topic_prefix}/gateway/{mqtt_client_id}/heartbeat")
     status_topic=(f"{mqtt_topic_prefix}/gateway/{mqtt_client_id}/status")
     test_data = ["temperature:28.6","temperature:abc","error_data","temperature:","temperature:31.5"]
+    online_status_payload=build_gateway_status_payload(mqtt_client_id,device,"online","connected")
     mqtt_client=None
     if mqtt_enabled:
         mqtt_client=create_mqtt_client(mqtt_client_id)
         print("mqtt client created")
-        status_payload=build_gateway_status_payload(mqtt_client_id,device)
+        status_payload=build_gateway_status_payload(mqtt_client_id,device,"offline" ,"unexpected_disconnect")
         configure_mqtt_last_will(mqtt_client,status_topic,status_payload)
         connect_mqtt_client(
             mqtt_client,
@@ -96,7 +97,9 @@ def main():
             mqtt_port,
             mqtt_keepalive,
             command_topic,
-            ack_topic
+            ack_topic,
+            status_topic,
+            online_status_payload
         )
     else:
         print("mqtt disabled")
@@ -139,6 +142,8 @@ def main():
             except KeyboardInterrupt:
                 print("\ngateway shutdown requested")
             finally:
+                graceful_shutdown_Offline_Payload=build_gateway_status_payload(mqtt_client_id,device,"offline","graceful_shutdown")
+                publish_mqtt_message(mqtt_client,status_topic,graceful_shutdown_Offline_Payload,retain=True)
                 disconnect_mqtt_client(mqtt_client)   
 if __name__ == "__main__":    
     main()

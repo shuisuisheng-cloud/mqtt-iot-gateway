@@ -6,6 +6,11 @@ def on_connect(client,userdata,connect_flags,reason_code,properties):
         command_topic =userdata["command_topic"]
         result,mid=client.subscribe(command_topic)
         print("mqtt command topic subscribed:",command_topic)
+        online_status_payload=userdata["online_status_payload"]
+        status_topic=userdata["status_topic"]
+        message_info = client.publish(status_topic,online_status_payload,retain=True)
+        if message_info.rc == mqtt.MQTT_ERR_SUCCESS:
+            print("mqtt message published:", status_topic)
     else:
         print("mqtt broker connection failed:",reason_code)
 def create_mqtt_client(client_id):
@@ -14,14 +19,14 @@ def create_mqtt_client(client_id):
         client_id=client_id
     )
     return client
-def connect_mqtt_client(client,broker,port,keepalive,command_topic,ack_topic):
-    client.user_data_set({"command_topic":command_topic,"ack_topic":ack_topic})
+def connect_mqtt_client(client,broker,port,keepalive,command_topic,ack_topic,status_topic,online_status_payload):
+    client.user_data_set({"command_topic":command_topic,"ack_topic":ack_topic,"status_topic":status_topic,"online_status_payload":online_status_payload})
     client.on_connect =on_connect
     client.on_message=on_message
     client.connect(broker,port,keepalive)
     client.loop_start()
-def publish_mqtt_message(client,topic,payload):
-    message_info = client.publish(topic,payload)
+def publish_mqtt_message(client,topic,payload,retain=False):
+    message_info = client.publish(topic,payload,retain=retain)
     if message_info.rc==mqtt.MQTT_ERR_SUCCESS:
         message_info.wait_for_publish()
         print("mqtt message published:",topic)
@@ -60,5 +65,5 @@ def disconnect_mqtt_client(client):
     client.loop_stop()
     print("mqtt connect disconnected")
 def configure_mqtt_last_will(client,topic,payload):
-    client.will_set(topic,payload)
+    client.will_set(topic,payload,retain=True)
     print("mqtt last will configure:",topic)
