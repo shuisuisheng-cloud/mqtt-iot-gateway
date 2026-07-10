@@ -32,8 +32,8 @@ def connect_mqtt_client(client,broker,port,keepalive,command_topic,ack_topic,sta
     client.on_connect =on_connect
     client.on_message=on_message
     client.connect(broker,port,keepalive)
-    client.loop_start()
     client.reconnect_delay_set(mqtt_reconnect_first_waiting_time,mqtt_reconnect_max_waiting_time)
+    client.loop_start()
 def publish_mqtt_message(client,topic,payload,retain=False):
     message_info = client.publish(topic,payload,retain=retain)
     if message_info.rc==mqtt.MQTT_ERR_SUCCESS:
