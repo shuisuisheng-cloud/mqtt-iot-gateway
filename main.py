@@ -78,6 +78,8 @@ def main():
     mqtt_keepalive = config["mqtt_keepalive"]
     use_real_serial=config["use_real_serial"]
     heartbeat_interval = config["heartbeat_interval"]
+    mqtt_reconnect_first_waiting_time=config["mqtt_reconnect_first_waiting_time"]
+    mqtt_reconnect_max_waiting_time=config["mqtt_reconnect_max_waiting_time"]
     telemetry_topic = f"{mqtt_topic_prefix}/{device}/telemetry"
     command_topic = f"{mqtt_topic_prefix}/{device}/command"
     ack_topic =f"{mqtt_topic_prefix}/{device}/ack"
@@ -99,7 +101,9 @@ def main():
             command_topic,
             ack_topic,
             status_topic,
-            online_status_payload
+            online_status_payload,
+            mqtt_reconnect_first_waiting_time,
+            mqtt_reconnect_max_waiting_time
         )
     else:
         print("mqtt disabled")
@@ -134,9 +138,10 @@ def main():
                 while True:
                     current_time=time.monotonic()
                     if current_time - last_heartbeat_time >= heartbeat_interval:
-                        timestamp=get_timestamp()
-                        heartbeat_payload=(build_heartbeat_payload(mqtt_client_id,device,timestamp))
-                        publish_mqtt_message(mqtt_client,heartbeat_topic,heartbeat_payload)
+                        if mqtt_client.is_connected():
+                            timestamp=get_timestamp()
+                            heartbeat_payload=(build_heartbeat_payload(mqtt_client_id,device,timestamp))
+                            publish_mqtt_message(mqtt_client,heartbeat_topic,heartbeat_payload)
                         last_heartbeat_time=current_time
                     time.sleep(1)
             except KeyboardInterrupt:

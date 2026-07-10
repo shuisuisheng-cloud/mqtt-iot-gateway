@@ -13,5 +13,7 @@
     "mqtt_client_id":"linux_stm32_gateway_01",
     "mqtt_topic_prefix":"edgeaiot",
     "mqtt_keepalive":60,
-    "heartbeat_interval": 10
+    "heartbeat_interval": 10,
+    "mqtt_reconnect_first_waiting_time":5,
+    "mqtt_reconnect_max_waiting_time":30
 }

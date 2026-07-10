@@ -13,18 +13,27 @@ def on_connect(client,userdata,connect_flags,reason_code,properties):
             print("mqtt message published:", status_topic)
     else:
         print("mqtt broker connection failed:",reason_code)
+def on_disconnect(client,userdata,disconnnect_flags,reason_code,properties):
+    if reason_code ==0:
+        print("mqtt graceful_shutdown",reason_code)
+    elif reason_code != 0:
+        print("mqtt unexpected disconnect",reason_code)
 def create_mqtt_client(client_id):
     client =mqtt.Client(
         callback_api_version=mqtt.CallbackAPIVersion.VERSION2,
         client_id=client_id
     )
     return client
-def connect_mqtt_client(client,broker,port,keepalive,command_topic,ack_topic,status_topic,online_status_payload):
-    client.user_data_set({"command_topic":command_topic,"ack_topic":ack_topic,"status_topic":status_topic,"online_status_payload":online_status_payload})
+def connect_mqtt_client(client,broker,port,keepalive,command_topic,ack_topic,status_topic,online_status_payload,
+                        mqtt_reconnect_first_waiting_time,mqtt_reconnect_max_waiting_time):
+    client.user_data_set({"command_topic":command_topic,"ack_topic":ack_topic,"status_topic":status_topic,
+                          "online_status_payload":online_status_payload})
+    client.on_disconnect=on_disconnect
     client.on_connect =on_connect
     client.on_message=on_message
     client.connect(broker,port,keepalive)
     client.loop_start()
+    client.reconnect_delay_set(mqtt_reconnect_first_waiting_time,mqtt_reconnect_max_waiting_time)
 def publish_mqtt_message(client,topic,payload,retain=False):
     message_info = client.publish(topic,payload,retain=retain)
     if message_info.rc==mqtt.MQTT_ERR_SUCCESS:
