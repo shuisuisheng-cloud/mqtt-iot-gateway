@@ -13,6 +13,8 @@ def on_connect(client,userdata,connect_flags,reason_code,properties):
             print("mqtt message published:", status_topic)
     else:
         print("mqtt broker connection failed:",reason_code)
+def on_connect_fail(client,userdata):
+    print("mqtt first connect fail")
 def on_disconnect(client,userdata,disconnnect_flags,reason_code,properties):
     if reason_code ==0:
         print("mqtt graceful_shutdown",reason_code)
@@ -29,10 +31,11 @@ def connect_mqtt_client(client,broker,port,keepalive,command_topic,ack_topic,sta
     client.user_data_set({"command_topic":command_topic,"ack_topic":ack_topic,"status_topic":status_topic,
                           "online_status_payload":online_status_payload})
     client.on_disconnect=on_disconnect
+    client.on_connect_fail=on_connect_fail
     client.on_connect =on_connect
     client.on_message=on_message
-    client.connect(broker,port,keepalive)
     client.reconnect_delay_set(mqtt_reconnect_first_waiting_time,mqtt_reconnect_max_waiting_time)
+    client.connect_async(broker,port,keepalive)
     client.loop_start()
 def publish_mqtt_message(client,topic,payload,retain=False):
     message_info = client.publish(topic,payload,retain=retain)

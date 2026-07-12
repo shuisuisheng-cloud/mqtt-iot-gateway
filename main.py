@@ -129,7 +129,7 @@ def main():
         print("mock serial mode")
         for serial_data in test_data:
             payload=process_serial_data(device,serial_data,threshold)
-            if payload is not None and mqtt_client is not None:
+            if payload is not None and mqtt_client is not None and mqtt_client.is_connected():
                 publish_mqtt_message(mqtt_client,telemetry_topic,payload)
     if mqtt_client is not None:
             last_heartbeat_time=0.0
@@ -147,8 +147,9 @@ def main():
             except KeyboardInterrupt:
                 print("\ngateway shutdown requested")
             finally:
-                graceful_shutdown_Offline_Payload=build_gateway_status_payload(mqtt_client_id,device,"offline","graceful_shutdown")
-                publish_mqtt_message(mqtt_client,status_topic,graceful_shutdown_Offline_Payload,retain=True)
+                if mqtt_client.is_connected():
+                    graceful_shutdown_Offline_Payload=build_gateway_status_payload(mqtt_client_id,device,"offline","graceful_shutdown")
+                    publish_mqtt_message(mqtt_client,status_topic,graceful_shutdown_Offline_Payload,retain=True)
                 disconnect_mqtt_client(mqtt_client)   
 if __name__ == "__main__":    
     main()
