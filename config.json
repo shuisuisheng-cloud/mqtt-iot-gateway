@@ -7,7 +7,7 @@
     "device": "stm32_node_01",
     "use_real_serial":  false ,
     "temperature_threshold": 30,
-    "mqtt_enabled": false,
+    "mqtt_enabled": true,
     "mqtt_broker": "localhost",
     "mqtt_port": 1883,
     "mqtt_client_id":"linux_stm32_gateway_01",
