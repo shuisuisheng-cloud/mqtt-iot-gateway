@@ -69,17 +69,23 @@ def handle_valid_data(temperature,device,timestamp,threshold):
     device_data=build_device_data(device,temperature,status,timestamp,threshold)
     json_data=json.dumps(device_data)
     save_line(json_data)
-    time.sleep(1)
     print("valid data:","device:",device_data["device"],"temperature:",device_data["temperature"],"status:",device_data["status"],"timestamp:",device_data["timestamp"])
     return json_data
 def handle_invalid_data(device,data,timestatus):
     line="device:"+" "+device+" "+"invalid_data:"+" "+data+" "+"timestamp:"+" "+timestatus
     save_line(line)
-    time.sleep(1)
     print("invalid data: "+"device: "+device +"raw: "+ data,"timestamp: " + timestatus)
     return None
+def handle_debug_data(serial_data):
+    print(f"stm32 debug: {serial_data}")
+    return None
 def process_serial_data(device,serial_data,threshold):
+    parts=serial_data.split(":")
     timestamp=get_timestamp()
+    if parts[0]!="temperature":
+        return handle_debug_data(serial_data)
+    elif len(parts)!=2:
+        return handle_invalid_data(device,serial_data,timestamp)
     temperature=parse_temperature(serial_data)
     if temperature is None:
         return handle_invalid_data(device,serial_data,timestamp)
@@ -109,7 +115,8 @@ def main():
     ack_topic =f"{mqtt_topic_prefix}/{device}/ack"
     heartbeat_topic = (f"{mqtt_topic_prefix}/gateway/{mqtt_client_id}/heartbeat")
     status_topic=(f"{mqtt_topic_prefix}/gateway/{mqtt_client_id}/status")
-    test_data = ["temperature:28.6","temperature:abc","error_data","temperature:","temperature:31.5"]
+    test_data = ["temperature:28.6","temperature:abc","error_data","temperature:","temperature:31.5",
+                 "temperature:26.4:extra","DHT11 raw: 41 0 26 4 71","DHT11 response: TIMEOUT","board:STM32F407VET6_CORE_BOARD_V2","KEY PRESSED"]
     online_status_payload=build_gateway_status_payload(mqtt_client_id,device,"online","connected")
     mqtt_client=None
     ser=None

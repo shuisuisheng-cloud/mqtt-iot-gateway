@@ -5,7 +5,7 @@
     "port": "/dev/ttyUSB0",
     "baudrate": 115200,
     "device": "stm32_node_01",
-    "use_real_serial":  false ,
+    "use_real_serial":  true ,
     "temperature_threshold": 30,
     "mqtt_enabled": true,
     "mqtt_broker": "localhost",
