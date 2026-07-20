@@ -7,7 +7,7 @@ from mqtt_client import create_mqtt_client,connect_mqtt_client,publish_mqtt_mess
 from gateway_status import build_heartbeat_payload,build_gateway_status_payload
 def open_ser_port(port,baudrate):
     try:
-        ser=serial.Serial(port,baudrate,timeout=0.2)
+        ser=serial.Serial(port,baudrate,timeout=0.2,write_timeout=0.2)
         print(f"成功打开{port}")
         return ser
     except serial.SerialException as e:
@@ -120,6 +120,18 @@ def main():
     online_status_payload=build_gateway_status_payload(mqtt_client_id,device,"online","connected")
     mqtt_client=None
     ser=None
+    use_mock_serial = not use_real_serial
+    if use_real_serial:
+        print("real serial mode")
+        ser = open_ser_port(port, baudrate)
+
+        if ser is None:
+            print(f"打开串口失败: {port}")
+            print("fallback to mock serial mode")
+            use_mock_serial = True
+    else:
+        print("mock serial mode")
+
     if mqtt_enabled:
         mqtt_client=create_mqtt_client(mqtt_client_id)
         print("mqtt client created")
@@ -135,7 +147,8 @@ def main():
             status_topic,
             online_status_payload,
             mqtt_reconnect_first_waiting_time,
-            mqtt_reconnect_max_waiting_time
+            mqtt_reconnect_max_waiting_time,
+            ser
         )
     else:
         print("mqtt disabled")
@@ -145,18 +158,7 @@ def main():
     print("mqtt client id:", mqtt_client_id)
     print("telemetry topic:", telemetry_topic)
     print("command topic:", command_topic)
-    use_mock_serial = not use_real_serial
 
-    if use_real_serial:
-        print("real serial mode")
-        ser = open_ser_port(port, baudrate)
-
-        if ser is None:
-            print(f"打开串口失败: {port}")
-            print("fallback to mock serial mode")
-            use_mock_serial = True
-    else:
-        print("mock serial mode")
     last_heartbeat_time=0.0
     last_mock_time=0.0
     test_data_number=0

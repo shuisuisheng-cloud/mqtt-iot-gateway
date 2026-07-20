@@ -1,5 +1,5 @@
 import paho.mqtt.client as mqtt
-from command_handler import parse_command_payload,execute_command,build_command_ack
+from command_handler import parse_command_payload,execute_command,build_command_ack,send_command_to_serial
 def on_connect(client,userdata,connect_flags,reason_code,properties):
     if reason_code == 0:
         print("mqtt broker connected:",reason_code)
@@ -27,9 +27,9 @@ def create_mqtt_client(client_id):
     )
     return client
 def connect_mqtt_client(client,broker,port,keepalive,command_topic,ack_topic,status_topic,online_status_payload,
-                        mqtt_reconnect_first_waiting_time,mqtt_reconnect_max_waiting_time):
+                        mqtt_reconnect_first_waiting_time,mqtt_reconnect_max_waiting_time,serial_port):
     client.user_data_set({"command_topic":command_topic,"ack_topic":ack_topic,"status_topic":status_topic,
-                          "online_status_payload":online_status_payload})
+                          "online_status_payload":online_status_payload,"serial_port":serial_port})
     client.on_disconnect=on_disconnect
     client.on_connect_fail=on_connect_fail
     client.on_connect =on_connect
@@ -57,6 +57,8 @@ def publish_command_ack(client,topic,payload):
 def on_message(client,userdata,message):
     topic=message.topic
     payload=message.payload.decode("utf-8")
+    serial_port = userdata.get("serial_port")
+    ack_topic=userdata["ack_topic"]
     print("mqtt command received")
     print("topic:",topic)
     print("payload",payload)
@@ -64,14 +66,10 @@ def on_message(client,userdata,message):
     if command is None:
         return
     print("command:",command)
-    command_result=execute_command(command)
-    if command_result:
-        print("command executed successfully:",command)
-    else:
-        print("command execution failed:",command)
-    ack_topic=userdata["ack_topic"]
-    ack_payload=build_command_ack(command,command_result)
-    publish_command_ack(client,ack_topic,ack_payload)
+    serial_send_result=send_command_to_serial(serial_port,command)
+    if not serial_send_result:
+        ack_payload=build_command_ack(command,serial_send_result)
+        publish_command_ack(client,ack_topic,ack_payload)
 def disconnect_mqtt_client(client):
     client.disconnect()
     client.loop_stop()
